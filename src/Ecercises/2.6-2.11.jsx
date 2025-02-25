@@ -1,12 +1,10 @@
-import axios from "axios";
 import { useMemo, useState } from "react";
-import personsService from "./services/personsService";
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: "awais", number: "07854122" },
+    { name: "Arto Hellas", number: "075986525" },
   ]);
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
@@ -25,7 +23,6 @@ const App = () => {
       item.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [search]);
-
   const addPerson = (event) => {
     event.preventDefault();
 
@@ -33,20 +30,17 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
-    axios.post("http://localhost:3001/persons", newPerson).then((response) => {
-      console.log(response);
-      setPersons(persons.concat(response.data));
-    });
+    const isDuplicate = persons.find(
+      (person) => person.name === newPerson.name
+    );
 
-    // const isDuplicate = persons.find(
-    //   (person) => person.name === newPerson.name
-    // );
+    if (!isDuplicate) {
+      setPersons(persons.concat(newPerson));
+    } else {
+      alert(`${newPerson.name}  is already in PhoneBook `);
+    }
 
-    // if (!isDuplicate) {
-    //   setPersons(persons.concat(newPerson));
-    // } else {
-    //   alert(`${newPerson.name}  is already in PhoneBook `);
-    // }
+    setNewName("");
   };
 
   return (
@@ -70,12 +64,8 @@ const App = () => {
           <button type="submit">Add Person</button>
         </div>
       </form>
-      <ul>
-        {persons.map((per) => (
-          <ul key={per.name}>{per.name}</ul>
-        ))}
-      </ul>
-      {/* <div>
+
+      <div>
         <h1 style={{ listStyle: "none", padding: 0 }}>
           {filteredPerson.length > 0 ? (
             filteredPerson.map((item) => <li key={item.name}>{item.name}</li>)
@@ -83,7 +73,7 @@ const App = () => {
             <li>No results found</li>
           )}
         </h1>
-      </div> */}
+      </div>
     </div>
   );
 };
