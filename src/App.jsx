@@ -1,15 +1,25 @@
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import personsService from "./services/personsService";
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: "awais", number: "07854122" },
+    { name: "awaissss", number: "32111111111" },
   ]);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    personsService.getAll().then((allPersons) => {
+      console.log("all data", allPersons);
+      if (allPersons) {
+        setPersons(allPersons);
+      }
+    });
+  }, []);
 
   const handleNameChange = (event) => {
     event.preventDefault();
@@ -28,16 +38,12 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-
     const newPerson = {
       name: newName,
       number: newNumber,
     };
-    axios.post("http://localhost:3001/persons", newPerson).then((response) => {
-      console.log(response);
-      setPersons(persons.concat(response.data));
-    });
 
+    personsService.create(newPerson);
     // const isDuplicate = persons.find(
     //   (person) => person.name === newPerson.name
     // );
@@ -70,11 +76,18 @@ const App = () => {
           <button type="submit">Add Person</button>
         </div>
       </form>
+
       <ul>
         {persons.map((per) => (
-          <ul key={per.name}>{per.name}</ul>
+          <li key={uuidv4()}>
+            {per.name}-{per.number}
+            <button style={{ color: "blue" }} type="submit">
+              delete
+            </button>
+          </li>
         ))}
       </ul>
+
       {/* <div>
         <h1 style={{ listStyle: "none", padding: 0 }}>
           {filteredPerson.length > 0 ? (
